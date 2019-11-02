@@ -58,6 +58,19 @@ Blockly.Blocks['string'] = {
 };
 
 
+Blockly.Blocks['bool'] = {
+    init: function () {
+        this.setColour(20);
+        this.setOutput(true, ["element"]);
+
+        this.appendDummyInput()
+            .setAlign(Blockly.ALIGN_CENTRE)
+            .appendField(new Blockly.FieldDropdown([
+                ['true', "TRUE"],
+                ['false', "FALSE"]
+            ]), 'bool_value');
+    }
+};
 Blockly.Blocks['number'] = {
   init: function() {
     this.setColour(210);

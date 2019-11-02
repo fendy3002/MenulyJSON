@@ -55,6 +55,9 @@ Blockly.JSON['true'] = function(block) {
 Blockly.JSON['false'] = function(block) {
     return false;
 };
+Blockly.JSON['bool'] = function(block) {
+    return false;
+};
 
 
 Blockly.JSON['string'] = function(block) {

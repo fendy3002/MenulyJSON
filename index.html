@@ -13,26 +13,27 @@
     <script type="text/javascript" src="field_textbutton.js"></script>
 
     <!-- override/extend some Blockly code (menu-based building code): -->
-    <script type="text/javascript" src="menuly_override.js"></script>
+    <!-- <script type="text/javascript" src="menuly_override.js"></script> -->
 
     <!-- blocks to build JSON structures from: -->
-    <script type="text/javascript" src="menuly_blocks.js"></script>
+    <!-- <script type="text/javascript" src="menuly_blocks.js"></script> -->
+    <script type="text/javascript" src="logical_compare_blocks.js"></script>
 
     <!-- transforming a blockly diagram into a JSON string: -->
-    <script type="text/javascript" src="menuly_codegen.js"></script>
+    <!-- <script type="text/javascript" src="menuly_codegen.js"></script> -->
 
     <!-- building a blockly diagram from a JSON string: -->
-    <script type="text/javascript" src="menuly_2blocks.js"></script>
+    <!-- <script type="text/javascript" src="menuly_2blocks.js"></script> -->
 
     <script>
 
-        function updateJSONarea() {
-            document.getElementById('json_area').value = Blockly.JSON.fromWorkspace( Blockly.getMainWorkspace() );
-        }
+        // function updateJSONarea() {
+        //     document.getElementById('json_area').value = Blockly.JSON.fromWorkspace( Blockly.getMainWorkspace() );
+        // }
 
-        function interpretJSONarea() {
-            Blockly.JSON.toWorkspace( document.getElementById('json_area').value, Blockly.getMainWorkspace() );
-        }
+        // function interpretJSONarea() {
+        //     Blockly.JSON.toWorkspace( document.getElementById('json_area').value, Blockly.getMainWorkspace() );
+        // }
 
     </script>
     <style>
@@ -56,12 +57,14 @@
     <div id="blocklyDiv" style="float: left; width: 74%; height: 100%"></div>
 
     <xml id="toolbox" style="display: none">
-        <block type="dictionary"></block>
-        <block type="array"></block>
+        <block type="start"></block>
         <block type="number"></block>
         <block type="string"></block>
-        <block type="true"></block>
-        <block type="false"></block>
+        <block type="bool"></block>
+        <block type="s_boolean"></block>
+        <block type="s_prop"></block>
+        <block type="s_date"></block>
+        <block type="s_compare"></block>
     </xml>
 
     <div style="margin-left: 74%; width: 24%; height: 100%">
