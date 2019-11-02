@@ -213,7 +213,7 @@ let between = (label) => {
                 .setAlign(Blockly.ALIGN_CENTRE)
                 .setCheck(['s_prop']);
 
-            this.appendValueInput('compare')
+            this.appendValueInput('max')
                 .setAlign(Blockly.ALIGN_CENTRE)
                 .setCheck(checkWhitelist);
         }

@@ -64,6 +64,12 @@ let buildAndConnect = function (json_structure, parentConnection, workspace) {
             else if (json_structure.hasOwnProperty("$date")) {
                 handle_s_date(json_structure, parentConnection, workspace);
             }
+            else if (json_structure.hasOwnProperty("$between")) {
+                handle_s_between("$between", json_structure, parentConnection, workspace);
+            }
+            else if (json_structure.hasOwnProperty("$betweenEx")) {
+                handle_s_between("$betweenEx", json_structure, parentConnection, workspace);
+            }
         }
     }
 };
@@ -104,7 +110,7 @@ let handle_s_compare = (json_structure, parentConnection, workspace) => {
 };
 let handle_s_prop = (json_structure, parentConnection, workspace) => {
     let block = workspace.newBlock('s_prop', true);
-    block.setFieldValue(json_structure.$prop, 'prop_value');
+    block.setFieldValue(json_structure.$prop, 'prop_name');
     block.initSvg();
     let blockOutput = block.outputConnection;
     blockOutput.connect(parentConnection);
@@ -117,4 +123,19 @@ let handle_s_date = (json_structure, parentConnection, workspace) => {
 
     let propVal = json_structure.$date;
     buildAndConnect(propVal, block.getInput("date_source").connection, workspace);
+};
+let handle_s_between = (propName, json_structure, parentConnection, workspace) => {
+    let blockName = propName == "$between" ? "s_between" : "s_between_ex";
+    let block = workspace.newBlock(blockName, true);
+    block.initSvg();
+    let blockOutput = block.outputConnection;
+    blockOutput.connect(parentConnection);
+
+    let propVal = json_structure[propName];
+    let min = propVal[0];
+    buildAndConnect(min, block.getInput("min").connection, workspace);
+    let source = propVal[1];
+    buildAndConnect(source, block.getInput("source").connection, workspace);
+    let max = propVal[2];
+    buildAndConnect(max, block.getInput("max").connection, workspace);
 };

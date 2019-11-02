@@ -45,9 +45,13 @@ Blockly.logical_compare['s_boolean'] = function (block) {
 };
 
 Blockly.logical_compare['s_date'] = function (block) {
-    let date_source = block.getInput('date_source');
+    let date_source = block.getInputTargetBlock('date_source');
+    let dateValue = null;
+    if (date_source) {
+        dateValue = Blockly.logical_compare[date_source.type](date_source);
+    }
     return {
-        $date: date_source
+        $date: dateValue
     };
 };
 Blockly.logical_compare['s_prop'] = function (block) {
@@ -100,5 +104,41 @@ Blockly.logical_compare['s_and'] = function (block) {
 Blockly.logical_compare['s_or'] = function (block) {
     return {
         $or: generateAndOr(block)
+    };
+};
+let generateBetween = function (block) {
+    let length = block.length;
+    let result = [];
+    let min = block.getInputTargetBlock('min');
+    let source = block.getInputTargetBlock('source');
+    let max = block.getInputTargetBlock('max');
+
+    let minValue = null;
+    if (min) {
+        minValue = Blockly.logical_compare[min.type](min);
+    }
+    let sourceValue = null;
+    if (source) {
+        sourceValue = Blockly.logical_compare[source.type](source);
+    }
+    let maxValue = null;
+    if (max) {
+        maxValue = Blockly.logical_compare[max.type](max);
+    }
+    return [
+        minValue,
+        sourceValue,
+        maxValue
+    ];
+};
+Blockly.logical_compare['s_between'] = function (block) {
+    return {
+        $between: generateBetween(block)
+    };
+};
+
+Blockly.logical_compare['s_between_ex'] = function (block) {
+    return {
+        $betweenEx: generateBetween(block)
     };
 };
