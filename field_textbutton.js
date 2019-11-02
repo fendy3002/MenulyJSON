@@ -5,7 +5,6 @@
 'use strict';
 
 goog.provide('Blockly.FieldTextbutton');
-
 goog.require('Blockly.Field');
 
 

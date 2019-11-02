@@ -7,7 +7,7 @@ Blockly.keyValueArrow = function () { return Blockly.RTL ? "⇐" : "⇒"; };
 
 Blockly.Blocks['start'] = {
     init: function () {
-        this.setColour(250);
+        this.setColour(290);
         this.appendValueInput('json')
             .setAlign(Blockly.ALIGN_CENTRE)
             .appendField("Eval")
@@ -19,7 +19,7 @@ Blockly.Blocks['start'] = {
 
 Blockly.Blocks['string'] = {
     init: function () {
-        this.setColour(190);
+        this.setColour(20);
         this.setOutput(true, ["string"]);
 
         this.appendDummyInput()
@@ -32,7 +32,7 @@ Blockly.Blocks['string'] = {
 
 Blockly.Blocks['number'] = {
     init: function () {
-        this.setColour(210);
+        this.setColour(20);
         this.setOutput(true, ["number"]);
 
         this.appendDummyInput()
@@ -69,11 +69,34 @@ Blockly.Blocks['s_boolean'] = {
             ]), 'bool_value');
     }
 };
+Blockly.Blocks['s_prop'] = {
+    init: function () {
+        this.setColour(20);
+        this.setOutput(true, ["s_prop"]);
+
+        this.appendDummyInput()
+            .setAlign(Blockly.ALIGN_CENTRE)
+            .appendField('$prop')
+            .appendField(new Blockly.FieldTextInput(''), 'prop_name');
+    }
+};
+Blockly.Blocks['s_date'] = {
+    init: function () {
+        this.setColour(20);
+        this.setOutput(true, ["s_date"]);
+
+        this.appendValueInput('date_source')
+            .setCheck(['string', 's_prop'])
+            .setAlign(Blockly.ALIGN_RIGHT)
+            .appendField('$date');
+    }
+};
 
 Blockly.Blocks['s_compare'] = {
     init: function () {
-        this.setColour(20);
+        this.setColour(210);
         this.setOutput(true, ["s_boolean"]);
+        this.setInputsInline(false);
 
         this.appendValueInput('source')
             .setAlign(Blockly.ALIGN_CENTRE)
@@ -110,68 +133,51 @@ Blockly.Blocks['s_compare'] = {
             ]);
     }
 };
-
-Blockly.Blocks['s_prop'] = {
-    init: function () {
-        this.setColour(20);
-        this.setOutput(true, ["s_prop"]);
-
-        this.appendDummyInput()
-            .setAlign(Blockly.ALIGN_CENTRE)
-            .appendField('$prop')
-            .appendField(new Blockly.FieldTextInput(''), 'prop_name');
-    }
-};
-Blockly.Blocks['s_date'] = {
-    init: function () {
-        this.setColour(20);
-        this.setOutput(true, ["s_date"]);
-
-        this.appendValueInput('date_source')
-            .setCheck(['string', 's_prop'])
-            .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField('$date');
-    }
-};
 let andOr = (label) => {
     return {
         length: 2,
         init: function () {
-            this.setColour(20);
+            this.setColour(210);
             this.setOutput(true, ["s_boolean"]);
 
+            this.setInputsInline(false);
             this.appendDummyInput()
                 .setAlign(Blockly.ALIGN_CENTRE)
                 .appendField(label)
-                .appendField(new Blockly.FieldTextbutton('+', function () { this.sourceBlock_.append(); }));
+                .appendField(new Blockly.FieldDropdown([
+                    ["-----", ""],
+                    ["Add", "ADD"],
+                    ["Delete last", "DELETE"]
+                ], this.checkAction.bind(this)), "ACTION");
 
             this.appendValueInput('element_0')
-                .setAlign(Blockly.ALIGN_RIGHT)
                 .setCheck(['s_boolean']);
             this.appendValueInput('element_1')
-                .setAlign(Blockly.ALIGN_RIGHT)
                 .setCheck(['s_boolean']);
         },
-        append: function () {
-            let lastIndex = this.length++;
+        checkAction: function (newValue) {
+            if (newValue === "ADD") {
+                let lastIndex = this.length++;
+                let inputName = 'element_' + lastIndex;
+                this.appendValueInput(inputName)
+                    .setCheck(['s_boolean'])
+                    .setAlign(Blockly.ALIGN_RIGHT);
+            }
+            else if (newValue === "DELETE") {
+                let lastIndex = this.length - 1;
+                let inputName = 'element_' + lastIndex;
+                this.delete(inputName);
+            }
 
-            let appended_input = this.appendValueInput('element_' + lastIndex);
-            appended_input.appendField(new Blockly.FieldTextbutton('–', function () { this.sourceBlock_.delete(appended_input); }))
-                .setAlign(Blockly.ALIGN_RIGHT)
-            //.appendSelector(['string', 'number', 'true', 'false', 'dictionary', 'array'], Blockly.selectionArrow(), 'null');
-
-            //this.moveInputBefore('element_' + lastIndex, 'close_bracket');
-            return appended_input;
+            return "";
         },
-        delete: function (inputToDelete) {
-            let inputNameToDelete = inputToDelete.name;
-
+        delete: function (inputNameToDelete) {
             let substructure = this.getInputTargetBlock(inputNameToDelete);
             if (substructure) {
                 substructure.dispose(true, true);
             }
             this.removeInput(inputNameToDelete);
-            let inputIndexToDelete = parseInt(inputToDelete.name.match(/\d+/)[0]);
+            let inputIndexToDelete = parseInt(inputNameToDelete.match(/\d+/)[0]);
             let lastIndex = --this.length;
 
             for (let i = inputIndexToDelete + 1; i <= lastIndex; i++) { // rename all the subsequent element-inputs
@@ -183,3 +189,32 @@ let andOr = (label) => {
 };
 Blockly.Blocks['s_and'] = andOr("$and");
 Blockly.Blocks['s_or'] = andOr("$or");
+
+let between = (label) => {
+    return {
+        init: function () {
+            this.setColour(210);
+            this.setOutput(true, ["s_boolean"]);
+
+            let checkWhitelist = [
+                'string',
+                'number',
+                's_prop',
+                's_date',
+            ];
+            this.appendValueInput('min')
+                .setAlign(Blockly.ALIGN_CENTRE)
+                .appendField(label)
+                .setCheck(checkWhitelist);
+            this.appendValueInput('source')
+                .setAlign(Blockly.ALIGN_CENTRE)
+                .setCheck(['s_prop']);
+
+            this.appendValueInput('compare')
+                .setAlign(Blockly.ALIGN_CENTRE)
+                .setCheck(checkWhitelist);
+        }
+    };
+};
+Blockly.Blocks['s_between'] = between("$between");
+Blockly.Blocks['s_between_ex'] = between("$betweenEx");
