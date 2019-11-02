@@ -62,11 +62,11 @@ Blockly.logical_compare['s_compare'] = function (block) {
     let compare = block.getInputTargetBlock('compare');
 
     let sourceValue = null;
-    if(source){
+    if (source) {
         sourceValue = Blockly.logical_compare[source.type](source);
     }
     let compareValue = null;
-    if(compare){
+    if (compare) {
         compareValue = Blockly.logical_compare[compare.type](compare);
     }
     return {
@@ -75,5 +75,30 @@ Blockly.logical_compare['s_compare'] = function (block) {
             operation,
             compareValue
         ]
+    };
+};
+let generateAndOr = function (block) {
+    let length = block.length;
+    let result = [];
+    for (let index = 0; index < length; index++) {
+        let source = block.getInputTargetBlock('element_' + index);
+        if (source) {
+            let value = Blockly.logical_compare[source.type](source);
+            result.push(value);
+        }
+        else {
+            result.push(null);
+        }
+    }
+    return result;
+};
+Blockly.logical_compare['s_and'] = function (block) {
+    return {
+        $and: generateAndOr(block)
+    };
+};
+Blockly.logical_compare['s_or'] = function (block) {
+    return {
+        $or: generateAndOr(block)
     };
 };

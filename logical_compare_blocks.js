@@ -133,3 +133,53 @@ Blockly.Blocks['s_date'] = {
             .appendField('$date');
     }
 };
+let andOr = (label) => {
+    return {
+        length: 2,
+        init: function () {
+            this.setColour(20);
+            this.setOutput(true, ["s_boolean"]);
+
+            this.appendDummyInput()
+                .setAlign(Blockly.ALIGN_CENTRE)
+                .appendField(label)
+                .appendField(new Blockly.FieldTextbutton('+', function () { this.sourceBlock_.append(); }));
+
+            this.appendValueInput('element_0')
+                .setAlign(Blockly.ALIGN_RIGHT)
+                .setCheck(['s_boolean']);
+            this.appendValueInput('element_1')
+                .setAlign(Blockly.ALIGN_RIGHT)
+                .setCheck(['s_boolean']);
+        },
+        append: function () {
+            let lastIndex = this.length++;
+
+            let appended_input = this.appendValueInput('element_' + lastIndex);
+            appended_input.appendField(new Blockly.FieldTextbutton('–', function () { this.sourceBlock_.delete(appended_input); }))
+                .setAlign(Blockly.ALIGN_RIGHT)
+            //.appendSelector(['string', 'number', 'true', 'false', 'dictionary', 'array'], Blockly.selectionArrow(), 'null');
+
+            //this.moveInputBefore('element_' + lastIndex, 'close_bracket');
+            return appended_input;
+        },
+        delete: function (inputToDelete) {
+            let inputNameToDelete = inputToDelete.name;
+
+            let substructure = this.getInputTargetBlock(inputNameToDelete);
+            if (substructure) {
+                substructure.dispose(true, true);
+            }
+            this.removeInput(inputNameToDelete);
+            let inputIndexToDelete = parseInt(inputToDelete.name.match(/\d+/)[0]);
+            let lastIndex = --this.length;
+
+            for (let i = inputIndexToDelete + 1; i <= lastIndex; i++) { // rename all the subsequent element-inputs
+                let input = this.getInput('element_' + i);
+                input.name = 'element_' + (i - 1);
+            }
+        }
+    };
+};
+Blockly.Blocks['s_and'] = andOr("$and");
+Blockly.Blocks['s_or'] = andOr("$or");

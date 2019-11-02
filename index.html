@@ -71,6 +71,8 @@
             </category>
             <category name="Logic">
                 <block type="s_compare"></block>
+                <block type="s_and"></block>
+                <block type="s_or"></block>
             </category>
         </xml>
 
@@ -89,6 +91,9 @@
             sound: false,
             collapse: true, comments: true, disable: false, scrollbars: true, trashcan: true // those ones are automatically true when there are categories
         });
+        let startBlock = Blockly.Block.obtain(Blockly.getMainWorkspace(), 'start');
+        startBlock.initSvg();
+        startBlock.render();
         //Blockly.JSON.toWorkspace('null', Blockly.getMainWorkspace()); // dogfooding: load the initial state using our own JSON converter
     </script>
 </body>
