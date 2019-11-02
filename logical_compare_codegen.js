@@ -2,6 +2,25 @@
 
 Blockly.logical_compare = new Blockly.Generator('logical_compare');
 
+Blockly.logical_compare.toText = function (workspace) {
+    let json_text = '';
+    let top_blocks = workspace.getTopBlocks(false);
+    for (let i in top_blocks) {
+        let top_block = top_blocks[i];
+        if (top_block.type == 'start') {
+            return JSON.stringify(Blockly.logical_compare['start'](top_block), null, 2);
+        }
+    }
+    return json_text;
+};
+Blockly.logical_compare['start'] = function (block) {
+    let jsonValue = block.getInputTargetBlock('json');
+    if (jsonValue) {
+        let evaluated = Blockly.logical_compare[jsonValue.type](jsonValue);
+        return evaluated;
+    }
+    return null;
+};
 Blockly.logical_compare['string'] = function (block) {
     let string_value = block.getFieldValue('string_value');
     return string_value;
@@ -26,7 +45,7 @@ Blockly.logical_compare['s_boolean'] = function (block) {
 };
 
 Blockly.logical_compare['s_date'] = function (block) {
-    let date_source = block.getFieldValue('date_source');
+    let date_source = block.getInput('date_source');
     return {
         $date: date_source
     };
@@ -38,14 +57,23 @@ Blockly.logical_compare['s_prop'] = function (block) {
     };
 };
 Blockly.logical_compare['s_compare'] = function (block) {
-    let source = block.getFieldValue('source');
+    let source = block.getInputTargetBlock('source');
     let operation = block.getFieldValue('operation');
-    let compare = block.getFieldValue('compare');
+    let compare = block.getInputTargetBlock('compare');
+
+    let sourceValue = null;
+    if(source){
+        sourceValue = Blockly.logical_compare[source.type](source);
+    }
+    let compareValue = null;
+    if(compare){
+        compareValue = Blockly.logical_compare[compare.type](compare);
+    }
     return {
         $compare: [
-            source,
+            sourceValue,
             operation,
-            compare
+            compareValue
         ]
     };
 };
