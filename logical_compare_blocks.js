@@ -101,7 +101,7 @@ Blockly.Blocks['s_compare'] = {
         this.appendValueInput('source')
             .setAlign(Blockly.ALIGN_CENTRE)
             .appendField("$compare")
-            .setCheck(['s_prop']);
+            .setCheck(['s_prop', 's_date']);
 
         this.appendDummyInput()
             .setAlign(Blockly.ALIGN_CENTRE)
@@ -211,7 +211,7 @@ let between = (label) => {
                 .setCheck(checkWhitelist);
             this.appendValueInput('source')
                 .setAlign(Blockly.ALIGN_CENTRE)
-                .setCheck(['s_prop']);
+                .setCheck(['s_prop', 's_date']);
 
             this.appendValueInput('max')
                 .setAlign(Blockly.ALIGN_CENTRE)
