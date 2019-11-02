@@ -25,61 +25,46 @@ let buildAndConnect = function (json_structure, parentConnection, workspace) {
             let block = workspace.newBlock('boolean', true);
             block.initSvg();
 
-            block.setFieldValue('bool_value', json_structure ? "TRUE" : "FALSE");
+            block.setFieldValue(json_structure ? "TRUE" : "FALSE", 'bool_value');
+            let blockOutput = block.outputConnection;
+            blockOutput.connect(parentConnection);
+        }
+        else if (type == 'number') {
+            let block = workspace.newBlock('number', true);
+            block.initSvg();
+
+            block.setFieldValue(json_structure, "number_value");
+            let blockOutput = block.outputConnection;
+            blockOutput.connect(parentConnection);
+        }
+        else if (type == 'string') {
+            let block = workspace.newBlock('string', true);
+            block.initSvg();
+
+            block.setFieldValue(json_structure, "string_value");
             let blockOutput = block.outputConnection;
             blockOutput.connect(parentConnection);
         }
         else if (type == "object") {
             if (json_structure.hasOwnProperty("$and")) {
-                let block = workspace.newBlock('s_and', true);
-                block.initSvg();
-                let blockOutput = block.outputConnection;
-                blockOutput.connect(parentConnection);
+                handle_s_andOr("$and", json_structure, parentConnection, workspace);
             }
-            if (json_structure.hasOwnProperty("$boolean")) {
+            else if (json_structure.hasOwnProperty("$or")) {
+                handle_s_andOr("$or", json_structure, parentConnection, workspace);
+            }
+            else if (json_structure.hasOwnProperty("$compare")) {
+                handle_s_compare(json_structure, parentConnection, workspace);
+            }
+            else if (json_structure.hasOwnProperty("$boolean")) {
                 handle_s_boolean(json_structure, parentConnection, workspace);
             }
+            else if (json_structure.hasOwnProperty("$prop")) {
+                handle_s_prop(json_structure, parentConnection, workspace);
+            }
+            else if (json_structure.hasOwnProperty("$date")) {
+                handle_s_date(json_structure, parentConnection, workspace);
+            }
         }
-        //     type = String(Boolean(json_structure));
-        // } else if (type == 'object') {
-        //     type = (json_structure instanceof Array) ? 'array' : 'dictionary';
-        // }
-
-        // var targetBlock = Blockly.Block.obtain(parentConnection.sourceBlock_.workspace, type);
-        // targetBlock.initSvg();
-        // targetBlock.render();
-
-        // var childConnection = targetBlock.outputConnection;
-        // parentConnection.connect(childConnection);
-
-        // switch (type) {
-        //     case 'string':
-        //         targetBlock.setFieldValue(String(json_structure), 'string_value');
-        //         break;
-        //     case 'number':
-        //         targetBlock.setFieldValue(String(json_structure), 'number_value');
-        //         break;
-        //     case 'dictionary':
-        //         var i = 0;
-        //         for (var key in json_structure) {
-        //             targetBlock.appendKeyValuePairInput();
-        //             targetBlock.setFieldValue(key, 'key_field_' + i);
-
-        //             var elementConnection = targetBlock.getInput('element_' + i).connection;
-        //             Blockly.JSON.buildAndConnect(json_structure[key], elementConnection);
-
-        //             i++;
-        //         }
-        //         break;
-        //     case 'array':
-        //         for (var i in json_structure) {
-        //             targetBlock.appendArrayElementInput();
-
-        //             var elementConnection = targetBlock.getInput('element_' + i).connection;
-        //             Blockly.JSON.buildAndConnect(json_structure[i], elementConnection);
-        //         }
-        //         break;
-        // }
     }
 };
 
@@ -89,4 +74,47 @@ let handle_s_boolean = (json_structure, parentConnection, workspace) => {
     block.initSvg();
     let blockOutput = block.outputConnection;
     blockOutput.connect(parentConnection);
-}
+};
+let handle_s_andOr = (propName, json_structure, parentConnection, workspace) => {
+    let blockName = propName == "$and" ? "s_and" : "s_or";
+    let block = workspace.newBlock(blockName, true);
+    block.initSvg();
+    let blockOutput = block.outputConnection;
+    blockOutput.connect(parentConnection);
+
+    let propVal = json_structure[propName];
+    for (let i = 0; i < propVal.length; i++) {
+        if(i > 1){
+            block.add.bind(block)();
+        }
+        let input = block.getInput('element_' + i);
+        buildAndConnect(propVal[i], input.connection, workspace);
+    }
+};
+let handle_s_compare = (json_structure, parentConnection, workspace) => {
+    let block = workspace.newBlock('s_compare', true);
+    block.initSvg();
+    let blockOutput = block.outputConnection;
+    blockOutput.connect(parentConnection);
+
+    let propVal = json_structure.$compare;
+    buildAndConnect(propVal[0], block.getInput("source").connection, workspace);
+    block.setFieldValue(propVal[1], "operation")
+    buildAndConnect(propVal[2], block.getInput("compare").connection, workspace);
+};
+let handle_s_prop = (json_structure, parentConnection, workspace) => {
+    let block = workspace.newBlock('s_prop', true);
+    block.setFieldValue(json_structure.$prop, 'prop_value');
+    block.initSvg();
+    let blockOutput = block.outputConnection;
+    blockOutput.connect(parentConnection);
+};
+let handle_s_date = (json_structure, parentConnection, workspace) => {
+    let block = workspace.newBlock("s_date", true);
+    block.initSvg();
+    let blockOutput = block.outputConnection;
+    blockOutput.connect(parentConnection);
+
+    let propVal = json_structure.$date;
+    buildAndConnect(propVal, block.getInput("date_source").connection, workspace);
+};
