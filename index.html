@@ -27,18 +27,17 @@
 
     <!-- building a blockly diagram from a JSON string: -->
     <!-- <script type="text/javascript" src="menuly_2blocks.js"></script> -->
+    <script type="text/javascript" src="logical_compare_parsetext.js"></script>
 
     <script>
-        function updateJSONarea() {
+        function toText() {
             document.getElementById('json_area').value = Blockly.logical_compare.toText(Blockly.getMainWorkspace());
-            //Blockly.logical_compare.toText(Blockly.getMainWorkspace());
-
         };
 
-        // function interpretJSONarea() {
-        //     Blockly.JSON.toWorkspace( document.getElementById('json_area').value, Blockly.getMainWorkspace() );
-        // }
-
+        function parseText() {
+            let jsonText = document.getElementById('json_area').value;
+            Blockly.logical_compare.parseText(jsonText, Blockly.getMainWorkspace());
+        }
     </script>
     <style>
         body {
@@ -70,7 +69,7 @@
                         <block type="number"></block>
                         <block type="string"></block>
                         <block type="s_boolean"></block>
-                        <block type="bool"></block>
+                        <block type="boolean"></block>
                         <block type="s_date"></block>
                     </category>
                     <category name="Logic" colour="210">
@@ -83,14 +82,11 @@
                 </xml>
             </div>
             <div class="col-12 col-lg-4">
-                <div style="">
-                    <button onclick='updateJSONarea()'>Generate JSON</button>
-                    <button onclick='interpretJSONarea()'>interpret JSON from the textarea below</button>
-                    <textarea id=json_area style="height: 95%; width: 100%"></textarea>
-                </div>
+                <button onclick="toText()" class="btn btn-primary">Generate JSON</button>
+                <button onclick="parseText()" class="btn btn-primary">interpret JSON from the textarea below</button>
+                <textarea id=json_area class="form-control" rows="20"></textarea>
             </div>
         </div>
-    </div>
     </div>
 
     <script>
@@ -101,9 +97,19 @@
             sound: false,
             collapse: true, comments: true, disable: false, scrollbars: true, trashcan: true // those ones are automatically true when there are categories
         });
-        //let startBlock = Blockly.Block.obtain(Blockly.getMainWorkspace(), 'start');
-        //startBlock.initSvg();
-        //startBlock.render();
+        let workspace = Blockly.getMainWorkspace();
+        
+        let startBlock = workspace.newBlock('start');
+        startBlock.initSvg();
+        let startBlockInput = startBlock.getInput("json").connection;
+
+        let s_andBlock = workspace.newBlock('s_and');
+        s_andBlock.initSvg();
+        let s_andBlockOutput = s_andBlock.outputConnection;
+        startBlockInput.connect(s_andBlockOutput);
+
+        workspace.render();
+        
         //Blockly.JSON.toWorkspace('null', Blockly.getMainWorkspace()); // dogfooding: load the initial state using our own JSON converter
     </script>
 </body>

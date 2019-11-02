@@ -42,7 +42,7 @@ Blockly.Blocks['number'] = {
     }
 };
 
-Blockly.Blocks['bool'] = {
+Blockly.Blocks['boolean'] = {
     init: function () {
         this.setColour(20);
         this.setOutput(true, ["boolean"]);
@@ -157,11 +157,7 @@ let andOr = (label) => {
         },
         checkAction: function (newValue) {
             if (newValue === "ADD") {
-                let lastIndex = this.length++;
-                let inputName = 'element_' + lastIndex;
-                this.appendValueInput(inputName)
-                    .setCheck(['s_boolean'])
-                    .setAlign(Blockly.ALIGN_RIGHT);
+                this.add();
             }
             else if (newValue === "DELETE") {
                 let lastIndex = this.length - 1;
@@ -170,6 +166,13 @@ let andOr = (label) => {
             }
 
             return "";
+        },
+        add: function() {
+            let lastIndex = this.length++;
+            let inputName = 'element_' + lastIndex;
+            this.appendValueInput(inputName)
+                .setCheck(['s_boolean'])
+                .setAlign(Blockly.ALIGN_RIGHT);
         },
         delete: function (inputNameToDelete) {
             let substructure = this.getInputTargetBlock(inputNameToDelete);
